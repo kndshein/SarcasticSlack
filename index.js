@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+const { WebClient } = require("@slack/web-api");
+const web = new WebClient(process.env.BOT_USER_OAUTH_TOKEN);
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -16,12 +18,23 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/mild", (req, res) => {
-  res.json({
-    status: 200,
-    response_type: "in_channel",
-    text: "Testing",
-  });
+app.post("/mild", async (req, res) => {
+  console.log(req);
+  try {
+    await web.chat.postMessage({
+      channel: "#sarcasticslack",
+      text: `Testing 2`,
+    });
+    console.log("Message posted!");
+    res.json({
+      status: 200,
+      as_user: true,
+      text: "Testing",
+    });
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
 });
 
 app.listen(PORT, () =>

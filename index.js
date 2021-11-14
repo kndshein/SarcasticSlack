@@ -24,6 +24,8 @@ app.post("/mild", async (req, res) => {
     await web.chat.postMessage({
       channel: "#sarcasticslack",
       text: `Testing 2`,
+      as_user: true,
+      token,
     });
     console.log("Message posted!");
     res.json({

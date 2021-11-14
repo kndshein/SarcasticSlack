@@ -19,22 +19,23 @@ app.get("/", (req, res) => {
 });
 
 app.post("/mild", async (req, res) => {
-  console.log(req);
+  res.status(200).send();
+  console.log(req.body);
+  const { token, channel_id, user_id, text } = req.body;
   try {
-    await web.chat.postMessage({
-      channel: "#sarcasticslack",
-      text: `Testing 2`,
-      as_user: true,
-      token,
+    const userInfo = await web.users.info({
+      token: process.env.BOT_USER_OAUTH_TOKEN,
+      user: user_id,
     });
-    console.log("Message posted!");
-    res.json({
-      status: 200,
-      as_user: true,
-      text: "Testing",
+
+    await web.chat.postMessage({
+      token: process.env.BOT_USER_OAUTH_TOKEN,
+      text: `${text} /s`,
+      channel: channel_id,
+      username: userInfo.user.profile.display_name_normalized,
+      icon_url: userInfo.user.profile.image_192,
     });
   } catch (error) {
-    console.log(error);
     res.send(error);
   }
 });

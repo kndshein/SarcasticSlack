@@ -19,6 +19,16 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use(function (req, res, next) {
+  console.log(
+    Object.entries(req.body)
+      .map((ele, idx) => [(ele[0] += "="), ele[1]])
+      .flat()
+      .join("&")
+  );
+  next();
+});
+
 app.post("/mild", async (req, res) => {
   console.log(req.body);
   const { token, response_url, channel_id, channel_name, user_id, text } =

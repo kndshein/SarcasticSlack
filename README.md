@@ -6,6 +6,8 @@ A Slack app that spices up messages -- mostly to convey sarcasm.
 
 - Node
 - Express
+- Axios
+- Slack's Web-API
 
 ### Current limitations
 

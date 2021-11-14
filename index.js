@@ -1,10 +1,11 @@
 require("dotenv").config();
 
 const { WebClient } = require("@slack/web-api");
-const web = new WebClient(process.env.BOT_USER_OAUTH_TOKEN);
 const express = require("express");
 const cors = require("cors");
+const axios = require("axios");
 const app = express();
+const web = new WebClient(process.env.BOT_USER_OAUTH_TOKEN);
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
@@ -19,24 +20,42 @@ app.get("/", (req, res) => {
 });
 
 app.post("/mild", async (req, res) => {
-  res.status(200).send();
   console.log(req.body);
-  const { token, channel_id, user_id, text } = req.body;
+  const { token, response_url, channel_id, channel_name, user_id, text } =
+    req.body;
   try {
-    const userInfo = await web.users.info({
-      token: process.env.BOT_USER_OAUTH_TOKEN,
-      user: user_id,
-    });
+    if (channel_name == "directmessage") {
+      const response = await axios.post(`${response_url}`, {
+        headers: {
+          token: process.env.BOT_USER_OAUTH_TOKEN,
+        },
+        channel: channel_id,
+        replace_original: "true",
+        response_type: "in_channel",
+        username: "Doug",
+        text: `${text} /s`,
+      });
+    } else {
+      const userInfo = await web.users.info({
+        token: process.env.BOT_USER_OAUTH_TOKEN,
+        user: user_id,
+      });
 
-    await web.chat.postMessage({
-      token: process.env.BOT_USER_OAUTH_TOKEN,
-      text: `${text} /s`,
-      channel: channel_id,
-      username: userInfo.user.profile.display_name_normalized,
-      icon_url: userInfo.user.profile.image_192,
-    });
+      await web.chat.postMessage({
+        token: process.env.BOT_USER_OAUTH_TOKEN,
+        text: `${text} /s`,
+        channel: channel_id,
+        username: userInfo.user.profile.display_name_normalized,
+        icon_url: userInfo.user.profile.image_192,
+      });
+    }
+
+    res.status(200).send();
   } catch (error) {
-    res.send(error);
+    console.log(error);
+    res.json({
+      text: `Oops, looks like chef's out for a smoke break. (Don't smoke, kids) Err code: ${error.data.error}`,
+    });
   }
 });
 

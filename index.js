@@ -26,13 +26,9 @@ app.post("/mild", async (req, res) => {
   try {
     if (channel_name == "directmessage") {
       const response = await axios.post(`${response_url}`, {
-        headers: {
-          token: process.env.BOT_USER_OAUTH_TOKEN,
-        },
         channel: channel_id,
         replace_original: "true",
         response_type: "in_channel",
-        username: "Doug",
         text: `${text} /s`,
       });
     } else {

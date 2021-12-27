@@ -8,7 +8,6 @@ const { createHmac, timingSafeEqual } = require("crypto");
 const querystring = require("querystring");
 
 const app = express();
-const bodyParser = require("body-parser");
 const web = new WebClient(process.env.BOT_USER_OAUTH_TOKEN);
 const PORT = process.env.PORT || 3000;
 
@@ -23,6 +22,7 @@ app.get("/", (req, res) => {
 
 app.use(express.urlencoded({ extended: true }));
 
+// Pseudocode found here: https://api.slack.com/authentication/verifying-requests-from-slack
 app.use(function (req, res, next) {
   let encodedReq = querystring.stringify(req.body);
   encodedReq = encodedReq.replace("%20", "+"); //TODO: Replace the brittle workaround here.
@@ -48,6 +48,7 @@ app.use(function (req, res, next) {
       status: 401,
       text: `Oops, either you're trying to steal the sauce recipe or the dev has botched the code.`,
     });
+    return;
   }
 });
 
